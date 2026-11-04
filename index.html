@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The CPG Classic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#0F3B26; --bg2:#165434; --panel:#F6F4EA; --ink:#14261B; --muted:#5B695F;
+  --line:#DAD6C4; --chip:#E8E4D2; --on:#1F6B40; --red:#B3122E; --flag:#F2C230;
+  --cond:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --serif:'Libre Caslon Display',Georgia,'Times New Roman',serif;
+  --sans:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A2A1B; --bg2:#123F28; --panel:#17271E; --ink:#ECEBE2; --muted:#9DB0A2;
+    --line:#2D4437; --chip:#22382B; --on:#2F8A55; --red:#F06A7E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A2A1B; --bg2:#123F28; --panel:#17271E; --ink:#ECEBE2; --muted:#9DB0A2;
+  --line:#2D4437; --chip:#22382B; --on:#2F8A55; --red:#F06A7E;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--flag);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding:12px 14px 112px}
+
+/* Masthead */
+.mast{text-align:center;color:#F6F4EA;padding:14px 0 18px}
+.mast svg{width:30px;height:30px}
+.mast h1{font-family:var(--serif);font-weight:400;font-size:46px;line-height:1;margin:4px 0 8px}
+.mast p{margin:0;font-family:var(--cond);font-size:17px;color:#BBD4C2;letter-spacing:.03em}
+.mast .sync{display:inline-block;margin-top:12px;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.1);font-family:var(--sans);font-size:12.5px;color:#CFE2D5}
+.mast .sync.live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#5BD07A;margin-right:6px;vertical-align:1px}
+.mast .sync.readonly,.mast .sync.error{background:rgba(242,194,48,.18);color:#F6E3A3}
+.mast p.tagline{font-family:var(--serif);font-style:italic;font-size:17px;color:#F2C230;letter-spacing:0;margin:-2px 0 6px}
+
+.panel{background:var(--panel);border-radius:14px;padding:16px;margin-bottom:14px}
+.panel h2{font-family:var(--serif);font-weight:400;font-size:25px;line-height:1.15;margin:0 0 4px}
+.panel h3{font-family:var(--cond);font-weight:700;font-size:20px;margin:0 0 6px}
+.sub{color:var(--muted);font-size:14.5px;margin:0 0 10px}
+.small{font-size:13px;color:var(--muted)}
+
+/* Leaderboard: a hand-hung tournament board, fixed light in any theme */
+.board{background:#0F3B26;border-radius:8px;padding:8px 8px 10px;border:3px solid #0A2A1B}
+.board-head{color:#fff;text-align:center;font-family:var(--cond);font-weight:700;font-size:28px;letter-spacing:.2em;padding:2px 0 8px}
+.board-grid{background:#FBFAF4;border:2px solid #0A2A1B}
+.brow{display:grid;grid-template-columns:42px 1fr repeat(3,42px) 58px;align-items:center;min-height:62px;border-top:2px solid #0A2A1B}
+.brow:first-child{border-top:0}
+.brow.hdr{min-height:28px;background:#165434;color:#fff;font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.1em;text-align:center}
+.brow.hdr span:nth-child(2){text-align:left;padding-left:8px}
+.bpos{font-family:var(--cond);font-weight:700;font-size:22px;text-align:center;color:#0F3B26}
+.bname{font-family:var(--cond);font-weight:700;font-size:25px;line-height:1;text-transform:uppercase;letter-spacing:.03em;color:#101A14;padding:6px 4px 6px 8px;min-width:0}
+.bname small{display:block;text-transform:none;letter-spacing:0;font-weight:500;font-size:14px;color:#56635A;margin-top:4px}
+.tile{margin:0 3px;height:40px;display:grid;place-items:center;background:#fff;border:1px solid #CDD0C1;box-shadow:inset 0 -3px 0 rgba(0,0,0,.05);font-family:var(--cond);font-weight:700;font-size:22px;color:#0F3B26}
+.tile.tot{font-size:27px;color:#B3122E}
+.tile.dim{color:#B9BDB0}
+.tag{display:inline-block;vertical-align:2px;margin-left:6px;padding:1px 6px;border-radius:3px;font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;background:#F2C230;color:#3A2C00}
+.tag.hot{background:#B3122E;color:#fff}
+.champ{text-align:center;background:var(--flag);color:#2B2100;border-radius:14px;padding:16px;margin-bottom:14px}
+.champ p{margin:0;font-family:var(--cond);font-size:16px}
+.champ strong{display:block;font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.1;margin-top:2px}
+
+table{border-collapse:collapse;width:100%}
+.btable td,.btable th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.btable th{font-family:var(--cond);font-weight:600;font-size:15px;color:var(--muted)}
+.btable td:first-child,.btable th:first-child{text-align:left}
+.btable tr:last-child td{border-bottom:0;font-weight:600}
+
+/* Day picker */
+.days{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.days button{background:var(--bg2);color:#CFE2D5;border:0;border-radius:10px;padding:8px 4px 9px;font-family:var(--cond);font-size:15px;line-height:1.15}
+.days button b{display:block;font-size:18px;color:#fff}
+.days button[aria-pressed="true"]{background:var(--panel);color:var(--muted)}
+.days button[aria-pressed="true"] b{color:var(--ink)}
+
+.stats{display:flex;gap:18px;margin:10px 0 8px;font-family:var(--cond)}
+.stats div{font-size:14px;color:var(--muted);line-height:1.1}
+.stats b{display:block;font-size:24px;color:var(--ink)}
+
+/* Hole */
+.stage{display:grid;grid-template-columns:132px 1fr;gap:16px;align-items:start}
+.hole-art{border-radius:12px;overflow:hidden;line-height:0;background:#2B6644}
+.hole-art svg{width:100%;height:auto;display:block}
+.hnum{font-family:var(--serif);font-size:44px;line-height:1;margin:2px 0 4px}
+.hmeta{font-family:var(--cond);font-size:20px;font-weight:600}
+.hmeta span{color:var(--muted);font-weight:500}
+.htags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.htag{font-size:12.5px;font-weight:600;padding:3px 8px;border-radius:4px;background:var(--chip)}
+.htag.ctp{background:var(--flag);color:#3A2C00}
+.htag.hard{background:var(--red);color:#fff}
+.nav{display:flex;gap:8px;margin-top:14px}
+.nav button{flex:1;border:0;border-radius:10px;padding:10px;background:var(--chip);font-family:var(--cond);font-weight:600;font-size:17px}
+.nav button:disabled{opacity:.35;cursor:default}
+.strip{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-top:10px}
+.strip button{border:1px solid var(--line);background:transparent;border-radius:6px;height:32px;font-family:var(--cond);font-weight:600;font-size:15px;padding:0}
+.strip button.done{background:var(--on);border-color:var(--on);color:#fff}
+.strip button[aria-current="true"]{outline:2px solid var(--ink);outline-offset:1px}
+
+/* Player entry */
+.pl{border-top:1px solid var(--line);padding:14px 0 12px}
+.pl:first-of-type{border-top:0}
+.pl-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pl-name{font-family:var(--cond);font-weight:700;font-size:23px;line-height:1.05}
+.earn{display:block;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--red);min-height:18px}
+.earn.neg{color:var(--muted)}
+.step{display:flex;align-items:center;gap:8px}
+.step button{width:46px;height:46px;border-radius:50%;border:0;background:var(--chip);font-size:26px;line-height:1}
+.score{width:54px;height:54px;display:grid;place-items:center;font-family:var(--cond);font-weight:700;font-size:32px}
+.score.empty{color:var(--muted);font-size:24px}
+.n.bir{border:2px solid var(--red);border-radius:50%;color:var(--red)}
+.n.eag{border:2px solid var(--red);border-radius:50%;color:var(--red);box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--red)}
+.n.bog{border:2px solid var(--ink)}
+.n.dbl{border:2px solid var(--ink);box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 13px;font-size:14px;font-weight:500;min-height:36px}
+.chip[aria-pressed="true"]{background:var(--on);border-color:var(--on);color:#fff}
+.lost{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:999px;padding:2px 4px 2px 12px;font-size:14px;min-height:36px}
+.lost button{border:0;background:var(--chip);width:28px;height:28px;border-radius:50%;font-size:17px;line-height:1}
+.lost b{min-width:22px;text-align:center}
+.award{background:var(--chip);border-radius:12px;padding:12px;margin-top:12px}
+.award h3{font-size:18px;margin-bottom:8px}
+.award .chip{background:var(--panel)}
+.award .chip[aria-pressed="true"]{background:var(--on)}
+
+/* Scorecard */
+.sc-wrap{overflow-x:auto;margin:4px -4px 0;padding:0 4px}
+.sc{font-family:var(--cond);font-size:16px;text-align:center;min-width:420px;margin-bottom:12px}
+.sc th,.sc td{border:1px solid var(--line);padding:3px 0;font-weight:600}
+.sc th{background:var(--chip);font-size:14px}
+.sc td:first-child,.sc th:first-child{text-align:left;padding-left:6px;min-width:70px}
+.sc .tot{background:var(--chip)}
+.sc .n{display:inline-grid;place-items:center;width:24px;height:24px}
+.sc .n.eag,.sc .n.dbl{width:20px;height:20px}
+.sc tr.parrow td{color:var(--muted);font-weight:500}
+
+.dayrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.dayrow:first-of-type{border-top:0}
+.dayrow b{font-family:var(--cond);font-size:20px}
+.dayrow span{font-size:13.5px;color:var(--muted);text-align:right}
+.textbtn{background:none;border:0;padding:6px 0;color:var(--muted);text-decoration:underline;font-size:14px}
+
+/* Rules */
+.rule{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.rule:first-of-type{border-top:0}
+.rule p{margin:2px 0 0;font-size:13.5px;color:var(--muted)}
+.rule b{font-family:var(--cond);font-size:21px;white-space:nowrap;color:var(--red)}
+.rule b.neg{color:var(--ink)}
+
+/* Setup */
+.field{display:grid;grid-template-columns:1fr 92px;gap:8px;margin-bottom:8px}
+.field input,.field select,.sel{width:100%;border:1px solid var(--line);border-radius:10px;background:transparent;padding:10px 12px;min-height:44px}
+.sel option{color:#14261B}
+.toggle{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.toggle:first-of-type{border-top:0}
+.toggle input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--on);flex:none}
+.toggle p{margin:2px 0 0;font-size:13.5px;color:var(--muted)}
+.dayset{border-top:1px solid var(--line);padding:12px 0}
+.dayset:first-of-type{border-top:0;padding-top:0}
+.ldrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.danger{border:1px solid var(--red);color:var(--red);background:transparent;border-radius:10px;padding:10px 14px;font-weight:600}
+
+/* Tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:center;background:#0A2A1B;border-top:1px solid #1E5537;padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs button{flex:1;max-width:140px;border:0;background:none;color:#97BBA3;font-family:var(--cond);font-weight:600;font-size:16px;letter-spacing:.05em;padding:13px 0 15px}
+.tabs button[aria-current="true"]{color:#fff;box-shadow:inset 0 3px 0 var(--flag)}
+
+.nas{width:100%;border-collapse:collapse;font-family:var(--cond);text-align:center}
+.nas th{font-weight:600;font-size:14px;color:var(--muted);padding:4px 2px 8px}
+.nas td{border-top:1px solid var(--line);padding:10px 2px;font-size:18px;font-weight:600}
+.nas td:first-child,.nas th:first-child{text-align:left}
+.nas td.won{color:var(--red);vertical-align:top}
+.nas .nwin{display:block;line-height:1.15}
+.nas .nwin+.nwin{margin-top:6px}
+.nas .pbox{display:inline-block;min-width:22px;margin-left:6px;padding:0 4px;border:1.5px solid var(--ink);border-radius:3px;font-family:var(--cond);font-weight:700;font-size:14px;line-height:17px;text-align:center;color:var(--ink);vertical-align:1px}
+.nas td.pcol{vertical-align:top}
+.nas .prow{display:flex;justify-content:space-between;align-items:center;gap:2px;font-family:var(--sans);font-size:13px;font-weight:500;line-height:1.6}
+.nas .prow.low{color:var(--red);font-weight:600}
+.nas .prow .pbox{margin-left:4px}
+.nas .nscore{display:block;font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--muted);margin-top:2px}
+.nas td.open{color:var(--muted);font-weight:500;font-size:15px}
+details.more summary{cursor:pointer;font-family:var(--cond);font-weight:700;font-size:20px;list-style-position:outside}
+details.more[open] summary{margin-bottom:8px}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);vertical-align:3px;margin-left:5px}
+.sc td{position:relative}
+.sc .sdot{position:absolute;top:2px;right:2px;width:5px;height:5px;border-radius:50%;background:var(--red)}
+.stroke{font-size:13px;font-weight:600;color:var(--on)}
+.flag-wave{transform-box:fill-box;transform-origin:left center;animation:wave 1.6s ease-in-out infinite}
+@keyframes wave{50%{transform:scaleX(.8) skewY(4deg)}}
+@media (prefers-reduced-motion:reduce){.flag-wave{animation:none}}
+@media (min-width:480px){.stage{grid-template-columns:160px 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav class="tabs" id="tabs" aria-label="Sections"></nav>
+
+<script>
+/* ---------- Course data (back-tee yardages) ---------- */
+const COURSES={
+  eagle:{name:'Eagle Creek Golf Club',short:'Eagle Creek',where:'Lake Nona, Orlando',design:'Ron Garl and Howard Swan',opened:2004,
+    note:'European-style layout with dozens of white-sand bunkers, water held in by wooden bulkheads, and quick Mini-Verde greens. A rare par 73.',
+    par:[4,4,4,5,3,4,4,3,5,4,3,4,5,4,4,5,3,5],
+    yds:[361,347,396,570,203,444,415,201,528,414,215,436,545,388,425,572,196,540],
+    hcp:[15,17,13,3,11,1,5,9,7,14,12,4,10,16,2,6,18,8]},
+  cgi:{name:'ChampionsGate International',short:'CG International',where:'ChampionsGate',design:'Greg Norman',opened:2000,
+    note:'Links-style course built to play firm and fast, closer to Scotland than Florida. Pick your tees wisely.',
+    par:[4,3,5,4,3,4,4,5,4,4,5,4,4,3,4,4,3,5],
+    yds:[458,216,577,365,219,496,366,530,398,417,588,340,448,237,442,467,142,538],
+    hcp:[3,17,13,15,5,1,9,7,11,12,6,16,14,10,4,2,18,8]},
+  cgn:{name:'ChampionsGate National',short:'CG National',where:'ChampionsGate',design:'Greg Norman',opened:2000,
+    note:'Classic American parkland through woods and wetlands, known for tough par 3s and a double green shared by holes 4 and 16.',
+    par:[4,5,4,4,3,4,5,4,4,3,4,3,4,5,3,4,4,5],
+    yds:[434,517,478,323,228,384,554,403,376,251,472,211,389,627,210,389,315,636],
+    hcp:[1,15,3,9,17,5,11,13,7,8,4,18,12,10,14,6,16,2]},
+  mag:{name:"Disney's Magnolia",short:'Magnolia',where:'Lake Buena Vista',design:'Joe Lee',opened:1971,
+    note:'A longtime PGA Tour stop with wide fairways, elevated greens and about 1,500 magnolia trees. The closing par 4 plays longer than plenty of par 5s.',
+    par:[4,4,3,5,4,3,4,5,4,5,4,3,4,4,5,4,3,4],
+    yds:[425,420,163,538,495,232,420,602,495,526,388,165,387,514,560,454,235,486],
+    hcp:[3,13,15,17,1,11,7,9,5,6,14,18,16,2,12,4,10,8]}
+};
+const DAYS=[
+  {label:'Wed',date:'Wednesday, Nov 12',contest:'Putting contest',how:'Three putts each from 10, 20 and 30 feet. Most makes wins; ties go to the closest misses.'},
+  {label:'Thu',date:'Thursday, Nov 13',contest:'Chipping contest',how:'Everyone chips three balls from the same spot off the green. Closest single ball wins.'},
+  {label:'Fri',date:'Friday, Nov 14',contest:'Lag challenge',how:'One putt each from 40 feet or more. Closest to the cup wins.'}
+];
+const PTS={front:3,back:3,total:4,birdie:1,eagle:3,ace:5,ctp:1,ld:1,fairways:2,lost:2,putts:2,contest:[2,1]};
+const SEGS={front:[0,1,2,3,4,5,6,7,8],back:[9,10,11,12,13,14,15,16,17],total:[...Array(18).keys()]};
+const SEGNAME={front:'Front nine',back:'Back nine',total:'Full 18'};
+const BONUS={ace:'Hole in one',eagle:'Eagles',birdie:'Birdies',ctp:'Closest to the pin',ld:'Longest drive',fairways:'Most fairways',lost:'Fewest lost balls',putts:'Fewest putts',contest:'After-round contest'};
+
+/* ---------- State ---------- */
+const KEY='fore-cup-v2';
+const newRound=()=>({holes:Array.from({length:18},()=>({s:{},fw:{},lost:{},pt:{},ctp:null,ld:null})),contest:[null,null]});
+const fresh=()=>({
+  players:[{id:'p0',name:'Alejandro',hcp:0},{id:'p1',name:'Rodrigo',hcp:0},{id:'p2',name:'Sebastian',hcp:0}],
+  courses:['eagle','cgi','mag'], ld:[[9,18],[9,18],[9,18]],
+  rounds:[newRound(),newRound(),newRound()],
+  ui:{tab:'board',day:0,hole:0}
+});
+let S;
+try{const raw=localStorage.getItem(KEY);S=raw?Object.assign(fresh(),JSON.parse(raw)):fresh()}catch(e){S=fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+/* ---------- Shared live board ---------- */
+let DB=null,sync='local',readOnly=false,pendingRender=false;
+const exists={},queues={},ready={},resolvers={};
+const SYNC={connecting:'Connecting to the live board…',slow:'Still connecting. Scores are saving on this phone for now.',live:'Live board, synced for everyone',error:'Live sync stopped. Scores are saving on this phone.',readonly:'View only. Ask the organizer to invite you as an Editor.'};
+const roundToDoc=r=>({holes:Object.fromEntries(r.holes.map((h,i)=>['h'+i,{s:{...h.s},fw:{...h.fw},lost:{...h.lost},pt:{...(h.pt||{})},ctp:h.ctp??null,ld:h.ld??null}])),contest:[...r.contest]});
+const docToRound=d=>{const H=(d&&d.holes)||{};return{holes:Array.from({length:18},(_,i)=>{const h=H['h'+i]||{};return{s:{...(h.s||{})},fw:{...(h.fw||{})},lost:{...(h.lost||{})},pt:{...(h.pt||{})},ctp:h.ctp??null,ld:h.ld??null}}),contest:Array.isArray(d&&d.contest)?[...d.contest]:[null,null]}};
+const setupDoc=()=>({players:S.players.map(p=>({...p})),courses:[...S.courses],ld:S.ld.map(x=>[...x])});
+['cup/setup','rounds/r0','rounds/r1','rounds/r2'].forEach(k=>{ready[k]=new Promise(res=>resolvers[k]=res)});
+function queue(path,fn){
+  if(!DB||readOnly)return;
+  const run=async()=>{await ready[path];return fn()};
+  queues[path]=(queues[path]||Promise.resolve()).then(run).catch(e=>{
+    const c=e&&e.code;
+    if(c==='invalid_argument'||c==='not_granted'||c==='revoked'){readOnly=true;sync='readonly';render();return}
+    return new Promise(r=>setTimeout(r,700+Math.random()*900)).then(fn).catch(()=>{sync='error';render()});
+  });
+}
+function pushSetup(){queue('cup/setup',()=>DB.doc('cup/setup').set(setupDoc()).then(()=>{exists['cup/setup']=true}))}
+function pushRoundFull(d){const path='rounds/r'+d;queue(path,()=>DB.doc(path).set(roundToDoc(S.rounds[d])).then(()=>{exists[path]=true}))}
+function pushRound(d,patch){
+  const path='rounds/r'+d;
+  if(!exists['cup/setup'])pushSetup();
+  queue(path,()=>exists[path]?DB.doc(path).update(patch):DB.doc(path).set(roundToDoc(S.rounds[d])).then(()=>{exists[path]=true}));
+}
+function refresh(){const ae=document.activeElement;if(ae&&ae.dataset&&ae.dataset.set){pendingRender=true;return}save();render()}
+async function startSync(){
+  if(!window.claude||typeof window.claude.use!=='function')return;
+  sync='connecting';render();
+  let db=null;try{db=await window.claude.use('db')}catch(e){}
+  if(!db){sync='local';render();return}
+  DB=db;
+  const seen=new Set();
+  const timer=setTimeout(()=>{if(sync==='connecting'){sync='slow';render()}},10000);
+  const ok=path=>{seen.add(path);if(seen.size>=4&&sync!=='readonly'){sync='live';clearTimeout(timer)}};
+  const onErr=e=>{clearTimeout(timer);if(e&&e.code==='revoked')readOnly=true;if(sync!=='readonly')sync=readOnly?'readonly':'error';render()};
+  DB.doc('cup/setup').onSnapshot(snap=>{
+    exists['cup/setup']=snap.exists;resolvers['cup/setup']();
+    if(snap.exists){const d=snap.data();if(Array.isArray(d.players))S.players=d.players.map(p=>({...p}));if(Array.isArray(d.courses))S.courses=[...d.courses];if(Array.isArray(d.ld))S.ld=d.ld.map(x=>[...x])}
+    if(!snap.metadata.fromCache)ok('cup/setup');refresh();
+  },onErr);
+  [0,1,2].forEach(d=>{const path='rounds/r'+d;DB.doc(path).onSnapshot(snap=>{
+    exists[path]=snap.exists;resolvers[path]();
+    if(snap.exists)S.rounds[d]=docToRound(snap.data());
+    if(!snap.metadata.fromCache)ok(path);refresh();
+  },onErr)});
+}
+
+/* ---------- Helpers ---------- */
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fp=v=>{const r=Math.round(v*2)/2;return Number.isInteger(r)?String(r):r.toFixed(1)};
+const fs=v=>v>0?'+'+fp(v):v<0?'−'+fp(-v):'0';
+const tp=v=>v===0?'E':v>0?'+'+v:'−'+(-v);
+const P=()=>S.players;
+const nameOf=id=>esc(P().find(p=>p.id===id).name);
+const ldHoles=d=>{const c=COURSES[S.courses[d]];return S.ld[d].filter(n=>c.par[n-1]>3)};
+function nclass(sc,par){if(sc==null)return'';const d=sc-par;return d<=-2?'eag':d===-1?'bir':d===1?'bog':d>=2?'dbl':''}
+// Strokes off the low man, given on the hardest holes first
+function playStrokes(id){const min=Math.min(...P().map(p=>+p.hcp||0));return Math.max(0,(+P().find(p=>p.id===id).hcp||0)-min)}
+function strokesOn(id,ck,i){const n=playStrokes(id),r=COURSES[ck].hcp[i];return Math.floor(n/18)+(r<=n%18?1:0)}
+
+function calcDay(d){
+  const ck=S.courses[d],c=COURSES[ck],r=S.rounds[d],ld=ldHoles(d),ids=P().map(p=>p.id),out={};
+  ids.forEach(id=>out[id]={gross:0,thru:0,toPar:0,pts:{},nassau:0,bonus:0,total:0,seg:{front:{gross:0,net:0,toPar:0,n:0,putts:0,ptn:0},back:{gross:0,net:0,toPar:0,n:0,putts:0,ptn:0},total:{gross:0,net:0,toPar:0,n:0,putts:0,ptn:0}}});
+  const add=(id,k,v)=>{if(!id||!out[id])return;out[id].pts[k]=(out[id].pts[k]||0)+v;out[id].total+=v;if(k in SEGS)out[id].nassau+=v;else out[id].bonus+=v};
+  r.holes.forEach((h,i)=>{
+    const par=c.par[i];
+    ids.forEach(id=>{
+      const sc=h.s[id];if(sc==null)return;
+      const o=out[id],net=sc-strokesOn(id,ck,i);
+      o.gross+=sc;o.thru++;o.toPar+=sc-par;
+      ['total',i<9?'front':'back'].forEach(k=>{const pv=(h.pt||{})[id];if(pv!=null){o.seg[k].putts+=pv;o.seg[k].ptn++}o.seg[k].gross+=sc;o.seg[k].net+=net;o.seg[k].toPar+=net-par;o.seg[k].n++});
+      if(sc===1)add(id,'ace',PTS.ace);else if(sc-par<=-2)add(id,'eagle',PTS.eagle);else if(sc-par===-1)add(id,'birdie',PTS.birdie);
+    });
+    if(par===3&&h.ctp)add(h.ctp,'ctp',PTS.ctp);
+    if(par>3&&ld.includes(i+1)&&h.ld)add(h.ld,'ld',PTS.ld);
+  });
+  const res={};
+  for(const k of Object.keys(SEGS)){
+    const len=SEGS[k].length;
+    if(ids.every(id=>out[id].seg[k].n===len)){
+      const low=Math.min(...ids.map(id=>out[id].seg[k].net));
+      const w=ids.filter(id=>out[id].seg[k].net===low);
+      if(w.length<ids.length)w.forEach(id=>add(id,k,PTS[k]/w.length));res[k]={done:true,winners:w,low,push:w.length===ids.length,sc:Object.fromEntries(w.map(id=>[id,[out[id].seg[k].gross,out[id].seg[k].net,out[id].seg[k].ptn===out[id].seg[k].n?out[id].seg[k].putts:null]]))};
+    }else{
+      const live=ids.filter(id=>out[id].seg[k].n>0);
+      if(live.length){const best=Math.min(...live.map(id=>out[id].seg[k].toPar));res[k]={done:false,leaders:live.filter(id=>out[id].seg[k].toPar===best),best}}
+      else res[k]=null;
+    }
+  }
+  const complete=!!(res.total&&res.total.done);
+  if(complete){
+    const split=(vals,best,k)=>{const top=best==='max'?Math.max(...vals.map(v=>v[1])):Math.min(...vals.map(v=>v[1]));const w=vals.filter(v=>v[1]===top);if(w.length<vals.length)w.forEach(v=>add(v[0],k,PTS[k]/w.length))};
+    split(ids.map(id=>[id,r.holes.filter((h,i)=>c.par[i]>3&&h.fw[id]).length]),'max','fairways');
+    split(ids.map(id=>[id,r.holes.reduce((a,h)=>a+(h.lost[id]||0),0)]),'min','lost');
+    if(r.holes.every(h=>ids.every(id=>(h.pt||{})[id]!=null)))split(ids.map(id=>[id,r.holes.reduce((a,h)=>a+h.pt[id],0)]),'min','putts');
+  }
+  if(r.contest[0])add(r.contest[0],'contest',PTS.contest[0]);
+  if(r.contest[1])add(r.contest[1],'contest',PTS.contest[1]);
+  const started=ids.some(id=>out[id].thru>0)||r.contest.some(Boolean);
+  return{out,res,complete,started};
+}
+function firstOpenHole(d){const r=S.rounds[d];const i=r.holes.findIndex(h=>P().some(p=>h.s[p.id]==null));return i<0?0:i}
+function puttCell(o,done){
+  const ids=P().map(p=>p.id).filter(id=>o[id].seg.total.ptn>0);
+  if(!ids.length)return`<td class="open">–</td>`;
+  const low=Math.min(...ids.map(id=>o[id].seg.total.putts));
+  return`<td class="pcol">${ids.map(id=>`<span class="prow${done&&o[id].seg.total.putts===low?' low':''}">${esc(P().find(p=>p.id===id).name.slice(0,3))}<span class="pbox">${o[id].seg.total.putts}</span></span>`).join('')}</td>`;
+}
+function segCell(x){
+  if(!x)return`<td class="open">–</td>`;
+  const scoreLine=id=>{const [g,n,pt]=x.sc[id];return`<span class="nscore">Shot ${g}${n!==g?`, net ${n}`:''}${pt!=null?`<span class="pbox" title="Putts" aria-label="${pt} putts">${pt}</span>`:''}</span>`};
+  if(x.done&&x.push)return`<td class="open">Push<span class="nscore">All net ${x.low}</span></td>`;
+  if(x.done)return`<td class="won">${x.winners.map(id=>`<span class="nwin">${nameOf(id)}${scoreLine(id)}</span>`).join('')}${x.winners.length>1?'<span class="nscore">Tied, points split</span>':''}</td>`;
+  return`<td class="open">${x.leaders.map(nameOf).join(' & ')} ${tp(x.best)}</td>`;
+}
+
+/* ---------- Hole illustration (stylized, not to scale) ---------- */
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hash(s){let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+let lastArt='';
+function holeSVG(ck,i){
+  const c=COURSES[ck],par=c.par[i],yds=c.yds[i],R=rng(hash(ck+'-'+i));
+  const tx=100,ty=316,L=Math.min(272,70+yds/640*205),gx=100+(R()-.5)*56,gy=ty-L;
+  let c1,c2;
+  if(par===3){c1={x:tx+(gx-tx)/3,y:ty-L/3};c2={x:tx+2*(gx-tx)/3,y:ty-2*L/3}}
+  else if(par===4){const C={x:100+(R()<.5?-1:1)*(28+R()*32),y:ty-L*.6};c1=C;c2=C}
+  else{const s=R()<.5?-1:1;c1={x:100+s*(30+R()*28),y:ty-L*.36};c2={x:100-s*(24+R()*28),y:ty-L*.72}}
+  const P0={x:tx,y:ty},P3={x:gx,y:gy};
+  const B=t=>{const u=1-t;return{x:u*u*u*P0.x+3*u*u*t*c1.x+3*u*t*t*c2.x+t*t*t*P3.x,y:u*u*u*P0.y+3*u*u*t*c1.y+3*u*t*t*c2.y+t*t*t*P3.y}};
+  const N=t=>{const u=1-t;const dx=3*u*u*(c1.x-P0.x)+6*u*t*(c2.x-c1.x)+3*t*t*(P3.x-c2.x),dy=3*u*u*(c1.y-P0.y)+6*u*t*(c2.y-c1.y)+3*t*t*(P3.y-c2.y);const m=Math.hypot(dx,dy)||1;return{x:-dy/m,y:dx/m}};
+  const d=`M${P0.x} ${P0.y} C${c1.x.toFixed(1)} ${c1.y.toFixed(1)} ${c2.x.toFixed(1)} ${c2.y.toFixed(1)} ${P3.x.toFixed(1)} ${P3.y.toFixed(1)}`;
+  let g='';
+  // trees along the edges
+  for(let k=0;k<18;k++){const side=R()<.5;const x=side?6+R()*26:168+R()*26,y=10+R()*320,r=6+R()*6;g+=`<circle cx="${x.toFixed(1)}" cy="${(y+2).toFixed(1)}" r="${r.toFixed(1)}" fill="#163E28" opacity=".55"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="#1F4E33"/>`}
+  // water
+  if(R()<.45){
+    if(par===3){const p=B(.5);g+=`<ellipse cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" rx="44" ry="20" fill="#3D7EA6"/><ellipse cx="${p.x.toFixed(1)}" cy="${(p.y-4).toFixed(1)}" rx="30" ry="9" fill="#5B98BD" opacity=".5"/>`}
+    else{const t=.42+R()*.2,p=B(t),n=N(t),s=R()<.5?-1:1;const x=Math.max(30,Math.min(170,p.x+n.x*s*44)),y=p.y+n.y*s*44;g+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="17" ry="34" fill="#3D7EA6"/>`}
+  }
+  // fairway with mowing stripes
+  if(par>3)g+=`<path d="${d}" fill="none" stroke="url(#mow)" stroke-width="30" stroke-linecap="round" pathLength="100" stroke-dasharray="74 200" stroke-dashoffset="-17"/>`;
+  // fairway bunkers
+  if(par>3){const n=1+Math.floor(R()*2);for(let k=0;k<n;k++){const t=.5+R()*.25,p=B(t),nn=N(t),s=R()<.5?-1:1;g+=`<ellipse cx="${(p.x+nn.x*s*19).toFixed(1)}" cy="${(p.y+nn.y*s*19).toFixed(1)}" rx="7" ry="11" fill="#E9DCAE" transform="rotate(${(R()*40-20).toFixed(0)} ${(p.x+nn.x*s*19).toFixed(1)} ${(p.y+nn.y*s*19).toFixed(1)})"/>`}}
+  // green, fringe, greenside bunkers
+  g+=`<ellipse cx="${gx}" cy="${gy}" rx="27" ry="21" fill="#5DAE62"/><ellipse cx="${gx}" cy="${gy}" rx="22" ry="17" fill="#7BC779"/>`;
+  const nb=1+Math.floor(R()*2.2);for(let k=0;k<nb;k++){const a=Math.PI*(.15+R()*.7)*(R()<.5?1:-1)+Math.PI/2;g+=`<ellipse cx="${(gx+Math.cos(a)*31).toFixed(1)}" cy="${(gy+Math.sin(a)*24).toFixed(1)}" rx="10" ry="6.5" fill="#E9DCAE"/>`}
+  // tee box
+  g+=`<rect x="${tx-11}" y="${ty-6}" width="22" height="12" rx="3" fill="#8DCB7C"/>`;
+  // shot line + ball
+  const animate=lastArt!==ck+i&&!matchMedia('(prefers-reduced-motion: reduce)').matches;lastArt=ck+i;
+  g+=`<path d="${d}" fill="none" stroke="#fff" stroke-width="1.3" stroke-dasharray="2 5" opacity=".55"/>`;
+  g+=`<ellipse cx="${gx}" cy="${gy+1}" rx="3" ry="2" fill="#0D2117"/>`;
+  g+=`<line x1="${gx}" y1="${gy}" x2="${gx}" y2="${gy-30}" stroke="#F4F1E6" stroke-width="1.6"/><path class="flag-wave" d="M${gx} ${gy-30} L${gx+17} ${gy-25} L${gx} ${gy-20} Z" fill="#F2C230"/>`;
+  g+=animate?`<circle r="3.4" fill="#fff" stroke="#0D2117" stroke-width=".6"><animateMotion dur="1.3s" fill="freeze" keyPoints="0;0.97" keyTimes="0;1" calcMode="spline" keySplines=".3 .1 .2 1" path="${d}"/></circle>`
+    :`<circle cx="${(gx-6).toFixed(1)}" cy="${(gy+5).toFixed(1)}" r="3.4" fill="#fff" stroke="#0D2117" stroke-width=".6"/>`;
+  return `<svg viewBox="0 0 200 340" role="img" aria-label="Illustration of hole ${i+1}, par ${par}, ${yds} yards">
+  <defs><pattern id="mow" width="200" height="16" patternUnits="userSpaceOnUse"><rect width="200" height="8" fill="#4F9C5B"/><rect y="8" width="200" height="8" fill="#5AAA66"/></pattern></defs>
+  <rect width="200" height="340" fill="#2B6644"/>${g}</svg>`;
+}
+
+/* ---------- Views ---------- */
+const crest=`<svg viewBox="0 0 30 30" aria-hidden="true"><line x1="11" y1="4" x2="11" y2="25" stroke="#F6F4EA" stroke-width="1.6"/><path d="M11 4 L24 8.5 L11 13 Z" fill="#F2C230"/><ellipse cx="15" cy="26" rx="9" ry="2.4" fill="#5AAA66"/></svg>`;
+
+function viewBoard(){
+  const days=[0,1,2].map(calcDay);
+  const rows=P().map(p=>{const d=days.map(x=>x.out[p.id]);return{p,d,total:d.reduce((a,x)=>a+x.total,0)}}).sort((a,b)=>b.total-a.total);
+  const anyStarted=days.some(x=>x.started);
+  const lastDay=[2,1,0].find(i=>days[i].started);
+  const max=Math.max(...rows.map(r=>r.total));
+  let html='';
+  if(days.every(x=>x.complete)){html+=`<div class="champ"><p>CPG Classic champion</p><strong>${rows.filter(r=>r.total===max).map(r=>esc(r.p.name)).join(' & ')}</strong></div>`}
+  html+=`<div class="board"><div class="board-head">LEADERS</div><div class="board-grid">
+  <div class="brow hdr"><span>POS</span><span>PLAYER</span><span>WED</span><span>THU</span><span>FRI</span><span>PTS</span></div>`;
+  rows.forEach(r=>{
+    const tied=rows.filter(x=>x.total===r.total).length>1,pos=rows.findIndex(x=>x.total===r.total)+1;
+    let line='';if(lastDay!=null){const o=r.d[lastDay];if(o.thru)line=o.thru===18?`${DAYS[lastDay].label}: shot ${o.gross} (${tp(o.toPar)})`:`${DAYS[lastDay].label}: ${tp(o.toPar)} thru ${o.thru}`}
+    const st=playStrokes(r.p.id);
+    html+=`<div class="brow"><span class="bpos">${anyStarted?(tied?'T':'')+pos:'–'}</span><span class="bname">${esc(r.p.name)}<small>${line||(st?`Gets ${st} stroke${st>1?'s':''} a round`:'&nbsp;')}</small></span>
+    ${r.d.map((o,i)=>`<span class="tile ${days[i].started?'':'dim'}">${days[i].started?fp(o.total):'–'}</span>`).join('')}
+    <span class="tile tot">${fp(r.total)}</span></div>`;
+  });
+  html+=`</div></div>`;
+
+  html+=`<div class="panel" style="margin-top:14px"><h2>The Nassau</h2><p class="sub">Low net score wins each nine and the full 18. Front 3, back 3, full 18 worth 4. All three tied is a push. The small box shows putts.</p>
+  <table class="nas"><tr><th></th><th>Front</th><th>Back</th><th>18</th><th>Putts</th></tr>
+  ${DAYS.map((x,k)=>`<tr><td>${x.label}</td>${['front','back','total'].map(s=>segCell(days[k].res[s])).join('')}${puttCell(days[k].out,days[k].complete)}</tr>`).join('')}
+  <tr><td>All</td><td colspan="3" class="open" style="text-align:right">Combined putts, all rounds</td>${puttCell(Object.fromEntries(P().map(p=>[p.id,{seg:{total:days.reduce((a,x)=>({putts:a.putts+x.out[p.id].seg.total.putts,ptn:a.ptn+x.out[p.id].seg.total.ptn}),{putts:0,ptn:0})}}])),false)}</tr></table></div>`;
+
+  if(anyStarted){
+    const cats=Object.keys(BONUS).filter(k=>rows.some(r=>r.d.some(o=>o.pts[k])));
+    html+=`<div class="panel"><details class="more"><summary>Bonus points</summary>
+    <table class="btable"><tr><th></th>${rows.map(r=>`<th>${esc(r.p.name)}</th>`).join('')}</tr>
+    <tr><td>Nassau</td>${rows.map(r=>`<td>${fp(r.d.reduce((a,o)=>a+o.nassau,0))}</td>`).join('')}</tr>
+    ${cats.map(k=>`<tr><td>${BONUS[k]}</td>${rows.map(r=>{const v=r.d.reduce((a,o)=>a+(o.pts[k]||0),0);return`<td>${v?fs(v):'·'}</td>`}).join('')}</tr>`).join('')}
+    <tr><td>Total</td>${rows.map(r=>`<td>${fp(r.total)}</td>`).join('')}</tr></table></details></div>`;
+  }else{
+    html+=`<div class="panel"><h2>Ready on the first tee</h2><p class="sub" style="margin:0">Put everyone's handicap in Setup, then enter scores hole by hole on the Round tab.</p></div>`;
+  }
+  return html;
+}
+
+function viewRound(){
+  const d=S.ui.day,ck=S.courses[d],c=COURSES[ck],r=S.rounds[d],i=S.ui.hole,h=r.holes[i],par=c.par[i],calc=calcDay(d),ld=ldHoles(d);
+  const totalPar=c.par.reduce((a,b)=>a+b,0),totalY=c.yds.reduce((a,b)=>a+b,0),hardest=c.hcp.indexOf(1)+1;
+  let html=`<div class="days">${DAYS.map((x,k)=>`<button data-a="day" data-v="${k}" aria-pressed="${k===d}"><b>${COURSES[S.courses[k]].short}</b>${x.label}, ${x.date.split(', ')[1]}</button>`).join('')}</div>`;
+  html+=`<div class="panel"><h2>${c.name}</h2><p class="sub" style="margin:0">${DAYS[d].date}, ${c.where}</p>
+  <div class="stats"><div><b>${totalPar}</b>par</div><div><b>${totalY.toLocaleString()}</b>yards, tips</div><div><b>#${hardest}</b>hardest hole</div></div>
+  <p class="small" style="margin:0">Designed by ${c.design}, opened ${c.opened}. ${c.note}</p></div>`;
+
+  html+=`<div class="panel"><h3>Today's Nassau</h3><table class="nas"><tr><th></th><th>Front</th><th>Back</th><th>18</th></tr>
+  <tr><td></td>${['front','back','total'].map(s=>segCell(calc.res[s])).join('')}</tr></table>
+  <p class="small" style="margin:6px 0 0">Net scores. Red is a win; grey shows who's leading. The small box shows putts.</p></div>`;
+
+  const tags=[];
+  if(par===3)tags.push(`<span class="htag ctp">Closest to the pin</span>`);
+  if(par>3&&ld.includes(i+1))tags.push(`<span class="htag ctp">Longest drive</span>`);
+  if(c.hcp[i]===1)tags.push(`<span class="htag hard">Hardest on the card</span>`);
+  if(c.hcp[i]===18)tags.push(`<span class="htag">Easiest on the card</span>`);
+  html+=`<div class="panel"><div class="stage"><div class="hole-art">${holeSVG(ck,i)}</div>
+  <div><div class="small">Hole</div><div class="hnum">${i+1}</div><div class="hmeta">Par ${par}</div><div class="hmeta"><span>${c.yds[i]} yds, tips</span></div><div class="hmeta"><span>Handicap ${c.hcp[i]}</span></div>
+  <div class="htags">${tags.join('')}</div></div></div>
+  <div class="nav"><button data-a="hole" data-v="${i-1}" ${i===0?'disabled':''}>Hole ${i||''}</button><button data-a="hole" data-v="${i+1}" ${i===17?'disabled':''}>Hole ${i<17?i+2:''}</button></div>
+  <div class="strip">${r.holes.map((hh,k)=>`<button data-a="hole" data-v="${k}" class="${P().every(p=>hh.s[p.id]!=null)?'done':''}" aria-current="${k===i}" aria-label="Hole ${k+1}">${k+1}</button>`).join('')}</div>
+  <p class="small" style="margin:10px 0 0">Course art is a stylized sketch, not the real layout.</p></div>`;
+
+  html+=`<div class="panel"><h3>Scores, hole ${i+1}</h3>`;
+  P().forEach(p=>{
+    const sc=h.s[p.id],dd=sc==null?null:sc-par,st=strokesOn(p.id,ck,i);
+    let earn='';
+    if(sc===1)earn=`Hole in one +${PTS.ace}`;else if(dd!=null&&dd<=-2)earn=`Eagle +${PTS.eagle}`;else if(dd===-1)earn=`Birdie +${PTS.birdie}`;
+    const strokeTxt=st?`<span class="stroke">${st>1?st+' strokes':'Gets a stroke'}${sc!=null?`, net ${sc-st}`:''}</span>`:'';
+    html+=`<div class="pl"><div class="pl-top"><div><div class="pl-name">${esc(p.name)}</div>${strokeTxt}<span class="earn">${earn}</span></div>
+    <div class="step"><button data-a="score" data-p="${p.id}" data-d="-1" aria-label="One less stroke for ${esc(p.name)}">−</button>
+    <div class="score n ${sc==null?'empty':nclass(sc,par)}" aria-live="polite">${sc==null?'–':sc}</div>
+    <button data-a="score" data-p="${p.id}" data-d="1" aria-label="One more stroke for ${esc(p.name)}">+</button></div></div>
+    <div class="opts">
+      ${par>3?`<button class="chip" data-a="fw" data-p="${p.id}" aria-pressed="${!!h.fw[p.id]}">Hit fairway</button>`:''}
+      <span class="lost">Putts <button data-a="pt" data-p="${p.id}" data-d="-1" aria-label="Fewer putts for ${esc(p.name)}">−</button><b>${(h.pt||{})[p.id]??'–'}</b><button data-a="pt" data-p="${p.id}" data-d="1" aria-label="More putts for ${esc(p.name)}">+</button></span>
+      <span class="lost">Lost balls <button data-a="lost" data-p="${p.id}" data-d="-1" aria-label="Fewer lost balls">−</button><b>${h.lost[p.id]||0}</b><button data-a="lost" data-p="${p.id}" data-d="1" aria-label="More lost balls">+</button></span>
+    </div></div>`;
+  });
+  html+=`<p class="small" style="margin:4px 0 0">Enter actual strokes. Tap + or − once to start at par; putts start at 2.</p>`;
+  const picker=(k,title)=>`<div class="award"><h3>${title}, +${PTS[k]}</h3><div class="opts" style="margin:0">${P().map(p=>`<button class="chip" data-a="award" data-k="${k}" data-p="${p.id}" aria-pressed="${h[k]===p.id}">${esc(p.name)}</button>`).join('')}</div></div>`;
+  if(par===3)html+=picker('ctp','Closest to the pin');
+  if(par>3&&ld.includes(i+1))html+=picker('ld','Longest drive (in the fairway)');
+  html+=`</div>`;
+
+  const half=a=>{const idx=[...Array(9)].map((_,k)=>a+k);
+    let t=`<table class="sc"><tr><th>Hole</th>${idx.map(k=>`<th>${k+1}</th>`).join('')}<th class="tot">${a?'In':'Out'}</th>${a?'<th class="tot">Tot</th>':''}</tr>`;
+    t+=`<tr class="parrow"><td>Par</td>${idx.map(k=>`<td>${c.par[k]}</td>`).join('')}<td class="tot">${idx.reduce((s,k)=>s+c.par[k],0)}</td>${a?`<td class="tot">${totalPar}</td>`:''}</tr>`;
+    P().forEach(p=>{const sum=idx.reduce((s,k)=>s+(r.holes[k].s[p.id]||0),0);
+      t+=`<tr><td>${esc(p.name)}</td>${idx.map(k=>{const v=r.holes[k].s[p.id];const dot=strokesOn(p.id,ck,k)?'<i class="sdot"></i>':'';return`<td>${dot}${v==null?'':`<span class="n ${nclass(v,c.par[k])}">${v}</span>`}</td>`}).join('')}<td class="tot">${sum||''}</td>${a?`<td class="tot">${calc.out[p.id].gross||''}</td>`:''}</tr>`});
+    return t+'</table>'};
+  html+=`<div class="panel"><h2>Scorecard</h2><p class="sub">Red dots mark stroke holes. Circles for birdies, squares for bogeys.</p><div class="sc-wrap">${half(0)}${half(9)}</div></div>`;
+
+  const ct=DAYS[d];
+  html+=`<div class="panel"><h2>${ct.contest}</h2><p class="sub">${ct.how}</p>
+  ${[0,1].map(k=>`<div style="margin-top:${k?10:0}px"><div class="small" style="margin-bottom:6px">${k?'Second':'Winner'}, +${PTS.contest[k]}</div><div class="opts" style="margin:0">${P().map(p=>`<button class="chip" data-a="contest" data-i="${k}" data-p="${p.id}" aria-pressed="${r.contest[k]===p.id}">${esc(p.name)}</button>`).join('')}</div></div>`).join('')}</div>`;
+
+  const sorted=[...P()].sort((a,b)=>calc.out[b.id].total-calc.out[a.id].total);
+  html+=`<div class="panel"><h2>${ct.label}'s points</h2><p class="sub">${calc.complete?'Round complete, everything settled.':'Fairways, lost balls and putts are settled after 18.'}</p>
+  ${sorted.map(p=>{const o=calc.out[p.id];return`<div class="dayrow"><b>${esc(p.name)} ${fp(o.total)}</b><span>Nassau ${fp(o.nassau)}, bonus ${fp(o.bonus)}</span></div>`}).join('')}
+  <button class="textbtn" data-a="resetday">Clear ${ct.label}'s round</button></div>`;
+  return html;
+}
+
+function viewRules(){
+  const R=(t,p,v)=>`<div class="rule"><div><strong>${t}</strong><p>${p}</p></div><b>${v}</b></div>`;
+  return `<div class="panel"><h2>The Nassau</h2><p class="sub">Three matches every day, decided on net score. Two-way ties split the points; if all three tie, it's a push and nobody scores. Most points after three days wins the CPG Classic.</p>
+  ${R('Front nine','Low net score on holes 1 to 9.','3')}
+  ${R('Back nine','Low net score on holes 10 to 18.','3')}
+  ${R('Full 18','Low net score for the round.','4')}
+  </div>
+  <div class="panel"><h2>Handicaps</h2><p class="sub" style="margin:0">The lowest handicap plays at zero. Everyone else gets the difference in strokes, one per hole starting with the hardest hole on the card. Stroke holes show a red dot on the scorecard.</p></div>
+  <div class="panel"><h2>Bonus points</h2><p class="sub">Counted on actual score, not net.</p>
+  ${R('Birdie','Every birdie, every hole.','+1')}
+  ${R('Eagle','Replaces the birdie point.','+3')}
+  ${R('Hole in one','Drinks are on you anyway.','+5')}
+  ${R('Closest to the pin','Every par 3, ball must be on the green.','+1')}
+  ${R('Longest drive','Two marked holes a day; it has to finish in the fairway.','+1')}
+  ${R('Most fairways','Par 4s and 5s, settled after 18. Ties split; a three-way tie pays nobody.','+2')}
+  ${R('Fewest lost balls','Settled after 18. Ties split; a three-way tie pays nobody.','+2')}
+  ${R('Fewest putts','Total putts for the round, settled after 18. Ties split; a three-way tie pays nobody.','+2')}
+  ${R('After-round contest','Putting, chipping, then a lag challenge on Friday.','+2 / +1')}
+  </div>`;
+}
+
+function viewSetup(){
+  return `<div class="panel"><h2>Players and handicaps</h2><p class="sub">Enter each handicap. Strokes are worked out from the lowest one.</p>
+  ${P().map(p=>{const st=playStrokes(p.id);return`<div class="field"><input aria-label="Player name" data-set="name:${p.id}" value="${esc(p.name)}"><input aria-label="Handicap for ${esc(p.name)}" type="number" min="0" max="40" inputmode="numeric" data-set="hcp:${p.id}" value="${p.hcp}"></div><p class="small" style="margin:-2px 0 10px">${st?`${esc(p.name)} gets ${st} stroke${st>1?'s':''} a round`:`${esc(p.name)} plays at zero`}</p>`}).join('')}</div>
+  <div class="panel"><h2>Courses</h2>
+  ${DAYS.map((x,k)=>{const c=COURSES[S.courses[k]];const holes=c.par.map((p,n)=>p>3?n+1:null).filter(Boolean);
+    return `<div class="dayset"><div class="small" style="margin-bottom:6px">${x.date}</div>
+    <select class="sel" data-set="course:${k}" aria-label="Course for ${x.date}">${Object.entries(COURSES).map(([key,v])=>`<option value="${key}" ${S.courses[k]===key?'selected':''}>${v.name}</option>`).join('')}</select>
+    <div class="ldrow">${[0,1].map(j=>`<select class="sel" data-set="ld:${k}:${j}" aria-label="Longest drive hole ${j+1}">${holes.map(n=>`<option value="${n}" ${S.ld[k][j]===n?'selected':''}>Long drive: #${n}</option>`).join('')}</select>`).join('')}</div></div>`}).join('')}
+  </div>
+  <div class="panel"><h2>Start over</h2><p class="sub">Wipes every score and setting on this phone.</p><button class="danger" data-a="reset">Reset the CPG Classic</button></div>`;
+}
+
+/* ---------- Render + events ---------- */
+function render(){
+  const t=S.ui.tab;
+  const views={board:viewBoard,round:viewRound,rules:viewRules,setup:viewSetup};
+  document.getElementById('app').innerHTML=`<header class="mast">${crest}<h1>The CPG Classic</h1><p class="tagline">Correals Pretending to be Good Athletes</p><p>Orlando, November 12–14, 2026</p>${SYNC[sync]?`<span class="sync ${sync}">${SYNC[sync]}</span>`:''}</header>`+views[t]();
+  document.getElementById('tabs').innerHTML=[['board','Leaderboard'],['round','Round'],['rules','Rules'],['setup','Setup']].map(([k,l])=>`<button data-a="tab" data-v="${k}" aria-current="${t===k}">${l}</button>`).join('');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,ds=b.dataset;
+  if(readOnly&&!['tab','day','hole'].includes(a))return;
+  let patch=null,full=false;const hk='h'+S.ui.hole;
+  const d=S.ui.day,r=S.rounds[d],h=r.holes[S.ui.hole],par=COURSES[S.courses[d]].par[S.ui.hole];
+  switch(a){
+    case'tab':S.ui.tab=ds.v;if(ds.v==='round')lastArt='';window.scrollTo(0,0);break;
+    case'day':S.ui.day=+ds.v;S.ui.hole=firstOpenHole(+ds.v);break;
+    case'hole':S.ui.hole=Math.max(0,Math.min(17,+ds.v));break;
+    case'score':{let v=h.s[ds.p];if(v==null)v=par;else v+=+ds.d;if(v<1)v=null;if(v>15)v=15;h.s[ds.p]=v;patch={holes:{[hk]:{s:{[ds.p]:v}}}};break}
+    case'fw':h.fw[ds.p]=!h.fw[ds.p];patch={holes:{[hk]:{fw:{[ds.p]:h.fw[ds.p]}}}};break;
+    case'pt':{h.pt=h.pt||{};const v=h.pt[ds.p];h.pt[ds.p]=v==null?2:Math.max(0,Math.min(9,v+ +ds.d));patch={holes:{[hk]:{pt:{[ds.p]:h.pt[ds.p]}}}};break}
+    case'lost':h.lost[ds.p]=Math.max(0,(h.lost[ds.p]||0)+ +ds.d);patch={holes:{[hk]:{lost:{[ds.p]:h.lost[ds.p]}}}};break;
+    case'award':h[ds.k]=h[ds.k]===ds.p?null:ds.p;patch={holes:{[hk]:{[ds.k]:h[ds.k]}}};break;
+    case'contest':{const k=+ds.i;r.contest[k]=r.contest[k]===ds.p?null:ds.p;if(r.contest[1-k]===r.contest[k])r.contest[1-k]=null;patch={contest:[...r.contest]};break}
+    case'resetday':if(!confirm(`Clear every score for ${DAYS[d].label}?`))return;S.rounds[d]=newRound();S.ui.hole=0;full=true;break;
+    case'reset':if(!confirm(DB?'Reset the whole tournament for everyone?':'Reset the whole tournament?'))return;{const ui=S.ui;S=fresh();S.ui=ui}save();render();pushSetup();[0,1,2].forEach(pushRoundFull);return;
+  }
+  save();render();
+  if(patch)pushRound(d,patch);
+  if(full)pushRoundFull(d);
+});
+document.addEventListener('change',e=>{
+  const el=e.target,k=el.dataset.set;if(!k)return;const [f,a,b]=k.split(':');
+  if(f==='name'){const p=P().find(x=>x.id===a);p.name=el.value.trim()||p.name}
+  if(f==='hcp'){P().find(x=>x.id===a).hcp=Math.max(0,Math.min(40,parseInt(el.value)||0))}
+  if(f==='course'){S.courses[+a]=el.value;const c=COURSES[el.value];const ok=c.par.map((p,n)=>p>3?n+1:null).filter(Boolean);S.ld[+a]=[9,18].map(n=>ok.includes(n)?n:ok[ok.length-1])}
+  if(f==='ld')S.ld[+a][+b]=+el.value;
+  if(readOnly){render();return}
+  pendingRender=false;save();render();pushSetup();
+});
+render();
+startSync();
+</script>
+</body>
+</html>
