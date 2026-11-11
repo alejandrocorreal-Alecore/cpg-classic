@@ -168,6 +168,15 @@ table{border-collapse:collapse;width:100%}
 .toggle p{margin:2px 0 0;font-size:13.5px;color:var(--muted)}
 .dayset{border-top:1px solid var(--line);padding:12px 0}
 .dayset:first-of-type{border-top:0;padding-top:0}
+.chtab{width:100%;border-collapse:collapse;text-align:center;font-family:var(--cond)}
+.chtab th{font-size:16px;font-weight:700;padding:0 2px 8px;vertical-align:bottom}
+.chtab th span{display:block;font-weight:500;font-size:12.5px;color:var(--muted)}
+.chtab td{border-top:1px solid var(--line);padding:12px 2px;vertical-align:top}
+.chtab td:first-child{text-align:left;font-weight:700;font-size:19px;line-height:1.1}
+.chtab td span{display:block;font-family:var(--sans);font-weight:500;font-size:12px;color:var(--muted);margin-top:4px}
+.chtab td b{display:block;font-size:32px;line-height:1;color:var(--red)}
+.teerow{display:grid;grid-template-columns:1fr;gap:4px;margin-top:10px}
+.teerow>span:first-child{font-family:var(--cond);font-weight:700;font-size:17px}
 .ldrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .danger{border:1px solid var(--red);color:var(--red);background:transparent;border-radius:10px;padding:10px 14px;font-weight:600}
 
@@ -213,22 +222,26 @@ const COURSES={
     note:'European-style layout with dozens of white-sand bunkers, water held in by wooden bulkheads, and quick Mini-Verde greens. A rare par 73.',
     par:[4,4,4,5,3,4,4,3,5,4,3,4,5,4,4,5,3,5],
     yds:[361,347,396,570,203,444,415,201,528,414,215,436,545,388,425,572,196,540],
-    hcp:[15,17,13,3,11,1,5,9,7,14,12,4,10,16,2,6,18,8]},
+    hcp:[15,17,13,3,11,1,5,9,7,14,12,4,10,16,2,6,18,8],
+    tees:[{n:'Black',y:7198,r:74.2,s:121},{n:'White',y:6857,r:72.4,s:119},{n:'Yellow',y:6407,r:70.4,s:117},{n:'Blue',y:5929,r:68.0,s:114}],dt:'White'},
   cgi:{name:'ChampionsGate International',short:'CG International',where:'ChampionsGate',design:'Greg Norman',opened:2000,
     note:'Links-style course built to play firm and fast, closer to Scotland than Florida. Pick your tees wisely.',
     par:[4,3,5,4,3,4,4,5,4,4,5,4,4,3,4,4,3,5],
     yds:[458,216,577,365,219,496,366,530,398,417,588,340,448,237,442,467,142,538],
-    hcp:[3,17,13,15,5,1,9,7,11,12,6,16,14,10,4,2,18,8]},
+    hcp:[3,17,13,15,5,1,9,7,11,12,6,16,14,10,4,2,18,8],
+    tees:[{n:'Black',y:7363,r:76.3,s:143},{n:'Blue',y:6792,r:74.1,s:137},{n:'White',y:6239,r:71.5,s:132},{n:'Gold',y:5618,r:68.0,s:117}],dt:'White'},
   cgn:{name:'ChampionsGate National',short:'CG National',where:'ChampionsGate',design:'Greg Norman',opened:2000,
     note:'Classic American parkland through woods and wetlands, known for tough par 3s and a double green shared by holes 4 and 16.',
     par:[4,5,4,4,3,4,5,4,4,3,4,3,4,5,3,4,4,5],
     yds:[434,517,478,323,228,384,554,403,376,251,472,211,389,627,210,389,315,636],
-    hcp:[1,15,3,9,17,5,11,13,7,8,4,18,12,10,14,6,16,2]},
+    hcp:[1,15,3,9,17,5,11,13,7,8,4,18,12,10,14,6,16,2],
+    tees:[{n:'Black',y:7197,r:74.1,s:128},{n:'Blue',y:6480,r:71.1,s:120},{n:'White',y:5949,r:67.9,s:116},{n:'Red',y:5121,r:64.0,s:106}],dt:'White'},
   mag:{name:"Disney's Magnolia",short:'Magnolia',where:'Lake Buena Vista',design:'Joe Lee',opened:1971,
     note:'A longtime PGA Tour stop with wide fairways, elevated greens and about 1,500 magnolia trees. The closing par 4 plays longer than plenty of par 5s.',
     par:[4,4,3,5,4,3,4,5,4,5,4,3,4,4,5,4,3,4],
     yds:[425,420,163,538,495,232,420,602,495,526,388,165,387,514,560,454,235,486],
-    hcp:[3,13,15,17,1,11,7,9,5,6,14,18,16,2,12,4,10,8]}
+    hcp:[3,13,15,17,1,11,7,9,5,6,14,18,16,2,12,4,10,8],
+    tees:[{n:'Classic',y:7505,r:76.6,s:142},{n:'Green',y:6965,r:74.1,s:137},{n:'White',y:6574,r:72.3,s:133},{n:'Yellow',y:6146,r:70.2,s:129},{n:'Yellow/Red',y:5678,r:67.7,s:124},{n:'Red',y:5200,r:65.6,s:115}],dt:'White'}
 };
 const DAYS=[
   {label:'Wed',date:'Wednesday, Nov 12',contest:'Putting contest',how:'Three putts each from 10, 20 and 30 feet. Most makes wins; ties go to the closest misses.'},
@@ -246,11 +259,13 @@ const newRound=()=>({holes:Array.from({length:18},()=>({s:{},fw:{},lost:{},pt:{}
 const fresh=()=>({
   players:[{id:'p0',name:'Alejandro',hcp:0},{id:'p1',name:'Rodrigo',hcp:0},{id:'p2',name:'Sebastian',hcp:0}],
   courses:['eagle','cgi','mag'], ld:[[9,18],[9,18],[9,18]],
+  tees:[{p0:'White',p1:'White',p2:'White'},{p0:'White',p1:'White',p2:'White'},{p0:'White',p1:'White',p2:'White'}],
   rounds:[newRound(),newRound(),newRound()],
   ui:{tab:'board',day:0,hole:0}
 });
 let S;
 try{const raw=localStorage.getItem(KEY);S=raw?Object.assign(fresh(),JSON.parse(raw)):fresh()}catch(e){S=fresh()}
+if(!S.whiteDefault){S.tees=[0,1,2].map(()=>({p0:'White',p1:'White',p2:'White'}));S.whiteDefault=true}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 /* ---------- Shared live board ---------- */
@@ -259,7 +274,7 @@ const exists={},queues={},ready={},resolvers={};
 const SYNC={connecting:'Connecting to the live board…',slow:'Still connecting. Scores are saving on this phone for now.',live:'Live board, synced for everyone',error:'Live sync stopped. Scores are saving on this phone.',readonly:'View only. Ask the organizer to invite you as an Editor.'};
 const roundToDoc=r=>({holes:Object.fromEntries(r.holes.map((h,i)=>['h'+i,{s:{...h.s},fw:{...h.fw},lost:{...h.lost},pt:{...(h.pt||{})},ctp:h.ctp??null,ld:h.ld??null}])),contest:[...r.contest]});
 const docToRound=d=>{const H=(d&&d.holes)||{};return{holes:Array.from({length:18},(_,i)=>{const h=H['h'+i]||{};return{s:{...(h.s||{})},fw:{...(h.fw||{})},lost:{...(h.lost||{})},pt:{...(h.pt||{})},ctp:h.ctp??null,ld:h.ld??null}}),contest:Array.isArray(d&&d.contest)?[...d.contest]:[null,null]}};
-const setupDoc=()=>({players:S.players.map(p=>({...p})),courses:[...S.courses],ld:S.ld.map(x=>[...x])});
+const setupDoc=()=>({players:S.players.map(p=>({...p})),courses:[...S.courses],ld:S.ld.map(x=>[...x]),tees:S.tees.map(x=>({...x}))});
 ['cup/setup','rounds/r0','rounds/r1','rounds/r2'].forEach(k=>{ready[k]=new Promise(res=>resolvers[k]=res)});
 function queue(path,fn){
   if(!DB||readOnly)return;
@@ -290,7 +305,7 @@ async function startSync(){
   const onErr=e=>{clearTimeout(timer);if(e&&e.code==='revoked')readOnly=true;if(sync!=='readonly')sync=readOnly?'readonly':'error';render()};
   DB.doc('cup/setup').onSnapshot(snap=>{
     exists['cup/setup']=snap.exists;resolvers['cup/setup']();
-    if(snap.exists){const d=snap.data();if(Array.isArray(d.players))S.players=d.players.map(p=>({...p}));if(Array.isArray(d.courses))S.courses=[...d.courses];if(Array.isArray(d.ld))S.ld=d.ld.map(x=>[...x])}
+    if(snap.exists){const d=snap.data();if(Array.isArray(d.players))S.players=d.players.map(p=>({...p}));if(Array.isArray(d.courses))S.courses=[...d.courses];if(Array.isArray(d.ld))S.ld=d.ld.map(x=>[...x]);if(Array.isArray(d.tees))S.tees=d.tees.map(x=>({...x}))}
     if(!snap.metadata.fromCache)ok('cup/setup');refresh();
   },onErr);
   [0,1,2].forEach(d=>{const path='rounds/r'+d;DB.doc(path).onSnapshot(snap=>{
@@ -310,8 +325,12 @@ const nameOf=id=>esc(P().find(p=>p.id===id).name);
 const ldHoles=d=>{const c=COURSES[S.courses[d]];return S.ld[d].filter(n=>c.par[n-1]>3)};
 function nclass(sc,par){if(sc==null)return'';const d=sc-par;return d<=-2?'eag':d===-1?'bir':d===1?'bog':d>=2?'dbl':''}
 // Strokes off the low man, given on the hardest holes first
-function playStrokes(id){const min=Math.min(...P().map(p=>+p.hcp||0));return Math.max(0,(+P().find(p=>p.id===id).hcp||0)-min)}
-function strokesOn(id,ck,i){const n=playStrokes(id),r=COURSES[ck].hcp[i];return Math.floor(n/18)+(r<=n%18?1:0)}
+// Official course handicap: Index x (Slope / 113) + (Course Rating - Par), rounded
+function teeOf(id,d){const c=COURSES[S.courses[d]];const t=((S.tees||[])[d]||{})[id];return c.tees.find(x=>x.n===t)||c.tees.find(x=>x.n===c.dt)||c.tees[0]}
+function courseHcp(id,d){const c=COURSES[S.courses[d]],t=teeOf(id,d),idx=+(P().find(p=>p.id===id).hcp)||0,par=c.par.reduce((a,b)=>a+b,0);return Math.round(idx*t.s/113+(t.r-par))}
+const stLabel=(id,d)=>{const n=playStrokes(id,d);return n?`Gets ${n} stroke${n>1?'s':''}`:'Plays at zero'};
+function playStrokes(id,d){const min=Math.min(...P().map(p=>courseHcp(p.id,d)));return Math.max(0,courseHcp(id,d)-min)}
+function strokesOn(id,d,i){const n=playStrokes(id,d),r=COURSES[S.courses[d]].hcp[i];return Math.floor(n/18)+(r<=n%18?1:0)}
 
 function calcDay(d){
   const ck=S.courses[d],c=COURSES[ck],r=S.rounds[d],ld=ldHoles(d),ids=P().map(p=>p.id),out={};
@@ -321,7 +340,7 @@ function calcDay(d){
     const par=c.par[i];
     ids.forEach(id=>{
       const sc=h.s[id];if(sc==null)return;
-      const o=out[id],net=sc-strokesOn(id,ck,i);
+      const o=out[id],net=sc-strokesOn(id,d,i);
       o.gross+=sc;o.thru++;o.toPar+=sc-par;
       ['total',i<9?'front':'back'].forEach(k=>{const pv=(h.pt||{})[id];if(pv!=null){o.seg[k].putts+=pv;o.seg[k].ptn++}o.seg[k].gross+=sc;o.seg[k].net+=net;o.seg[k].toPar+=net-par;o.seg[k].n++});
       if(sc===1)add(id,'ace',PTS.ace);else if(sc-par<=-2)add(id,'eagle',PTS.eagle);else if(sc-par===-1)add(id,'birdie',PTS.birdie);
@@ -429,8 +448,8 @@ function viewBoard(){
   rows.forEach(r=>{
     const tied=rows.filter(x=>x.total===r.total).length>1,pos=rows.findIndex(x=>x.total===r.total)+1;
     let line='';if(lastDay!=null){const o=r.d[lastDay];if(o.thru)line=o.thru===18?`${DAYS[lastDay].label}: shot ${o.gross} (${tp(o.toPar)})`:`${DAYS[lastDay].label}: ${tp(o.toPar)} thru ${o.thru}`}
-    const st=playStrokes(r.p.id);
-    html+=`<div class="brow"><span class="bpos">${anyStarted?(tied?'T':'')+pos:'–'}</span><span class="bname">${esc(r.p.name)}<small>${line||(st?`Gets ${st} stroke${st>1?'s':''} a round`:'&nbsp;')}</small></span>
+    const st=lastDay!=null?playStrokes(r.p.id,lastDay):0;
+    html+=`<div class="brow"><span class="bpos">${anyStarted?(tied?'T':'')+pos:'–'}</span><span class="bname">${esc(r.p.name)}<small>${line||(`Index ${(+r.p.hcp||0).toFixed(1)}`)}</small></span>
     ${r.d.map((o,i)=>`<span class="tile ${days[i].started?'':'dim'}">${days[i].started?fp(o.total):'–'}</span>`).join('')}
     <span class="tile tot">${fp(r.total)}</span></div>`;
   });
@@ -462,6 +481,7 @@ function viewRound(){
   <div class="stats"><div><b>${totalPar}</b>par</div><div><b>${totalY.toLocaleString()}</b>yards, tips</div><div><b>#${hardest}</b>hardest hole</div></div>
   <p class="small" style="margin:0">Designed by ${c.design}, opened ${c.opened}. ${c.note}</p></div>`;
 
+  html+=`<div class="panel"><h3>Today's handicaps</h3>${P().map(p=>{const t=teeOf(p.id,d),ch=courseHcp(p.id,d),st=playStrokes(p.id,d);return`<div class="dayrow"><b>${esc(p.name)}</b><span>${t.n} tees, index ${(+p.hcp||0).toFixed(1)}, course handicap ${ch}<br><strong style="color:var(--ink)">${st?`Gets ${st} stroke${st>1?'s':''}`:'Plays at zero'}</strong></span></div>`}).join('')}</div>`;
   html+=`<div class="panel"><h3>Today's Nassau</h3><table class="nas"><tr><th></th><th>Front</th><th>Back</th><th>18</th></tr>
   <tr><td></td>${['front','back','total'].map(s=>segCell(calc.res[s])).join('')}</tr></table>
   <p class="small" style="margin:6px 0 0">Net scores. Red is a win; grey shows who's leading. The small box shows putts.</p></div>`;
@@ -480,7 +500,7 @@ function viewRound(){
 
   html+=`<div class="panel"><h3>Scores, hole ${i+1}</h3>`;
   P().forEach(p=>{
-    const sc=h.s[p.id],dd=sc==null?null:sc-par,st=strokesOn(p.id,ck,i);
+    const sc=h.s[p.id],dd=sc==null?null:sc-par,st=strokesOn(p.id,d,i);
     let earn='';
     if(sc===1)earn=`Hole in one +${PTS.ace}`;else if(dd!=null&&dd<=-2)earn=`Eagle +${PTS.eagle}`;else if(dd===-1)earn=`Birdie +${PTS.birdie}`;
     const strokeTxt=st?`<span class="stroke">${st>1?st+' strokes':'Gets a stroke'}${sc!=null?`, net ${sc-st}`:''}</span>`:'';
@@ -504,7 +524,7 @@ function viewRound(){
     let t=`<table class="sc"><tr><th>Hole</th>${idx.map(k=>`<th>${k+1}</th>`).join('')}<th class="tot">${a?'In':'Out'}</th>${a?'<th class="tot">Tot</th>':''}</tr>`;
     t+=`<tr class="parrow"><td>Par</td>${idx.map(k=>`<td>${c.par[k]}</td>`).join('')}<td class="tot">${idx.reduce((s,k)=>s+c.par[k],0)}</td>${a?`<td class="tot">${totalPar}</td>`:''}</tr>`;
     P().forEach(p=>{const sum=idx.reduce((s,k)=>s+(r.holes[k].s[p.id]||0),0);
-      t+=`<tr><td>${esc(p.name)}</td>${idx.map(k=>{const v=r.holes[k].s[p.id];const dot=strokesOn(p.id,ck,k)?'<i class="sdot"></i>':'';return`<td>${dot}${v==null?'':`<span class="n ${nclass(v,c.par[k])}">${v}</span>`}</td>`}).join('')}<td class="tot">${sum||''}</td>${a?`<td class="tot">${calc.out[p.id].gross||''}</td>`:''}</tr>`});
+      t+=`<tr><td>${esc(p.name)}</td>${idx.map(k=>{const v=r.holes[k].s[p.id];const dot=strokesOn(p.id,d,k)?'<i class="sdot"></i>':'';return`<td>${dot}${v==null?'':`<span class="n ${nclass(v,c.par[k])}">${v}</span>`}</td>`}).join('')}<td class="tot">${sum||''}</td>${a?`<td class="tot">${calc.out[p.id].gross||''}</td>`:''}</tr>`});
     return t+'</table>'};
   html+=`<div class="panel"><h2>Scorecard</h2><p class="sub">Red dots mark stroke holes. Circles for birdies, squares for bogeys.</p><div class="sc-wrap">${half(0)}${half(9)}</div></div>`;
 
@@ -526,7 +546,7 @@ function viewRules(){
   ${R('Back nine','Low net score on holes 10 to 18.','3')}
   ${R('Full 18','Low net score for the round.','4')}
   </div>
-  <div class="panel"><h2>Handicaps</h2><p class="sub" style="margin:0">The lowest handicap plays at zero. Everyone else gets the difference in strokes, one per hole starting with the hardest hole on the card. Stroke holes show a red dot on the scorecard.</p></div>
+  <div class="panel"><h2>Handicaps</h2><p class="sub" style="margin:0">Everyone enters their handicap index. Each day the app turns it into a course handicap with the official formula: index × (slope ÷ 113) + (course rating − par), using the rating and slope of the tees each player picks. The lowest course handicap plays at zero, and everyone else gets the difference in strokes, one per hole starting with the hardest hole on the card. Stroke holes show a red dot on the scorecard.</p></div>
   <div class="panel"><h2>Bonus points</h2><p class="sub">Counted on actual score, not net.</p>
   ${R('Birdie','Every birdie, every hole.','+1')}
   ${R('Eagle','Replaces the birdie point.','+3')}
@@ -541,12 +561,17 @@ function viewRules(){
 }
 
 function viewSetup(){
-  return `<div class="panel"><h2>Players and handicaps</h2><p class="sub">Enter each handicap. Strokes are worked out from the lowest one.</p>
-  ${P().map(p=>{const st=playStrokes(p.id);return`<div class="field"><input aria-label="Player name" data-set="name:${p.id}" value="${esc(p.name)}"><input aria-label="Handicap for ${esc(p.name)}" type="number" min="0" max="40" inputmode="numeric" data-set="hcp:${p.id}" value="${p.hcp}"></div><p class="small" style="margin:-2px 0 10px">${st?`${esc(p.name)} gets ${st} stroke${st>1?'s':''} a round`:`${esc(p.name)} plays at zero`}</p>`}).join('')}</div>
+  return `<div class="panel"><h2>Players and handicap index</h2><p class="sub">Enter each player's handicap index, like 16.0. Course handicaps are worked out for each day below.</p>
+  ${P().map(p=>`<div class="field"><input aria-label="Player name" data-set="name:${p.id}" value="${esc(p.name)}"><input aria-label="Handicap index for ${esc(p.name)}" type="number" min="0" max="54" step="0.1" inputmode="decimal" data-set="hcp:${p.id}" value="${(+p.hcp||0).toFixed(1)}"></div>`).join('')}</div>
+  <div class="panel"><h2>Course handicaps</h2><p class="sub">Worked out from each index for the White tees, using the official formula. Updates as you type.</p>
+  <table class="chtab"><tr><th></th>${DAYS.map((x,k)=>`<th>${x.label}<span>${COURSES[S.courses[k]].short}</span></th>`).join('')}</tr>
+  ${P().map(p=>`<tr><td>${esc(p.name)}<span>Index ${(+p.hcp||0).toFixed(1)}</span></td>${[0,1,2].map(k=>`<td><b id="ch-${p.id}-${k}">${courseHcp(p.id,k)}</b><span id="st-${p.id}-${k}">${stLabel(p.id,k)}</span>${teeOf(p.id,k).n!=='White'?`<span>${teeOf(p.id,k).n} tees</span>`:''}</td>`).join('')}</tr>`).join('')}</table>
+  <p class="small" style="margin:10px 0 0">The big number is each player's course handicap. Strokes in the Nassau are given off the lowest one.</p></div>
   <div class="panel"><h2>Courses</h2>
   ${DAYS.map((x,k)=>{const c=COURSES[S.courses[k]];const holes=c.par.map((p,n)=>p>3?n+1:null).filter(Boolean);
     return `<div class="dayset"><div class="small" style="margin-bottom:6px">${x.date}</div>
     <select class="sel" data-set="course:${k}" aria-label="Course for ${x.date}">${Object.entries(COURSES).map(([key,v])=>`<option value="${key}" ${S.courses[k]===key?'selected':''}>${v.name}</option>`).join('')}</select>
+    ${P().map(p=>{const t=teeOf(p.id,k),ch=courseHcp(p.id,k),st=playStrokes(p.id,k);return`<div class="teerow"><span>${esc(p.name)}</span><select class="sel" data-set="tee:${k}:${p.id}" aria-label="Tees for ${esc(p.name)}">${c.tees.map(tt=>`<option value="${tt.n}" ${tt.n===t.n?'selected':''}>${tt.n}, ${tt.y.toLocaleString()} yds (${tt.r} / ${tt.s})</option>`).join('')}</select><span class="small">Course handicap ${ch}, ${st?`gets ${st}`:'plays at zero'}</span></div>`}).join('')}
     <div class="ldrow">${[0,1].map(j=>`<select class="sel" data-set="ld:${k}:${j}" aria-label="Longest drive hole ${j+1}">${holes.map(n=>`<option value="${n}" ${S.ld[k][j]===n?'selected':''}>Long drive: #${n}</option>`).join('')}</select>`).join('')}</div></div>`}).join('')}
   </div>
   <div class="panel"><h2>Start over</h2><p class="sub">Wipes every score and setting on this phone.</p><button class="danger" data-a="reset">Reset the CPG Classic</button></div>`;
@@ -581,11 +606,19 @@ document.addEventListener('click',e=>{
   if(patch)pushRound(d,patch);
   if(full)pushRoundFull(d);
 });
+document.addEventListener('input',e=>{
+  const k=e.target.dataset&&e.target.dataset.set;if(!k||!k.startsWith('hcp:'))return;
+  const p=P().find(x=>x.id===k.split(':')[1]);if(!p)return;
+  p.hcp=Math.round(Math.max(0,Math.min(54,parseFloat(e.target.value)||0))*10)/10;
+  P().forEach(q=>[0,1,2].forEach(d=>{const a=document.getElementById(`ch-${q.id}-${d}`),b=document.getElementById(`st-${q.id}-${d}`);if(a)a.textContent=courseHcp(q.id,d);if(b)b.textContent=stLabel(q.id,d)}));
+  save();
+});
 document.addEventListener('change',e=>{
   const el=e.target,k=el.dataset.set;if(!k)return;const [f,a,b]=k.split(':');
   if(f==='name'){const p=P().find(x=>x.id===a);p.name=el.value.trim()||p.name}
-  if(f==='hcp'){P().find(x=>x.id===a).hcp=Math.max(0,Math.min(40,parseInt(el.value)||0))}
-  if(f==='course'){S.courses[+a]=el.value;const c=COURSES[el.value];const ok=c.par.map((p,n)=>p>3?n+1:null).filter(Boolean);S.ld[+a]=[9,18].map(n=>ok.includes(n)?n:ok[ok.length-1])}
+  if(f==='hcp'){P().find(x=>x.id===a).hcp=Math.round(Math.max(0,Math.min(54,parseFloat(el.value)||0))*10)/10}
+  if(f==='tee'){S.tees=S.tees||[{},{},{}];S.tees[+a]=S.tees[+a]||{};S.tees[+a][b]=el.value}
+  if(f==='course'){S.courses[+a]=el.value;const c=COURSES[el.value];S.tees=S.tees||[{},{},{}];S.tees[+a]=Object.fromEntries(P().map(p=>[p.id,c.dt]));const ok=c.par.map((p,n)=>p>3?n+1:null).filter(Boolean);S.ld[+a]=[9,18].map(n=>ok.includes(n)?n:ok[ok.length-1])}
   if(f==='ld')S.ld[+a][+b]=+el.value;
   if(readOnly){render();return}
   pendingRender=false;save();render();pushSetup();
