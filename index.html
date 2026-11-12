@@ -236,6 +236,12 @@ const COURSES={
     yds:[434,517,478,323,228,384,554,403,376,251,472,211,389,627,210,389,315,636],
     hcp:[1,15,3,9,17,5,11,13,7,8,4,18,12,10,14,6,16,2],
     tees:[{n:'Black',y:7197,r:74.1,s:128},{n:'Blue',y:6480,r:71.1,s:120},{n:'White',y:5949,r:67.9,s:116},{n:'Red',y:5121,r:64.0,s:106}],dt:'White'},
+  cgcc:{name:'ChampionsGate Country Club',short:'CG Country Club',where:'ChampionsGate',design:'Clifton, Ezell & Clifton',opened:2015,
+    note:'A private club built on rolling elevation changes, with big white-sand bunkers and smooth greens. Ranked among the top 25 course conditions in the U.S. in 2015.',
+    par:[4,3,4,5,4,3,4,4,5,5,3,4,4,3,4,4,4,5],
+    yds:[407,212,440,538,377,193,484,402,544,551,168,431,425,208,326,392,460,513],
+    hcp:[7,11,3,5,13,17,1,9,15,12,14,4,2,10,16,8,6,18],
+    tees:[{n:'Gold',y:7071,r:74.4,s:135},{n:'Blue',y:6508,r:71.9,s:131},{n:'Black Blended',y:6147,r:70.3,s:125},{n:'White',y:5930,r:69.5,s:120},{n:'Orange Blended',y:5609,r:67.9,s:117},{n:'Red',y:4968,r:64.8,s:111}],dt:'White'},
   mag:{name:"Disney's Magnolia",short:'Magnolia',where:'Lake Buena Vista',design:'Joe Lee',opened:1971,
     note:'A longtime PGA Tour stop with wide fairways, elevated greens and about 1,500 magnolia trees. The closing par 4 plays longer than plenty of par 5s.',
     par:[4,4,3,5,4,3,4,5,4,5,4,3,4,4,5,4,3,4],
@@ -258,7 +264,7 @@ const KEY='fore-cup-v2';
 const newRound=()=>({holes:Array.from({length:18},()=>({s:{},fw:{},lost:{},pt:{},ctp:null,ld:null})),contest:[null,null]});
 const fresh=()=>({
   players:[{id:'p0',name:'Alejandro',hcp:0},{id:'p1',name:'Rodrigo',hcp:0},{id:'p2',name:'Sebastian',hcp:0}],
-  courses:['eagle','cgi','mag'], ld:[[9,18],[9,18],[9,18]],
+  courses:['eagle','cgcc','mag'], ld:[[9,18],[9,18],[9,18]],
   tees:[{p0:'White',p1:'White',p2:'White'},{p0:'White',p1:'White',p2:'White'},{p0:'White',p1:'White',p2:'White'}],
   rounds:[newRound(),newRound(),newRound()],
   ui:{tab:'board',day:0,hole:0}
@@ -266,6 +272,7 @@ const fresh=()=>({
 let S;
 try{const raw=localStorage.getItem(KEY);S=raw?Object.assign(fresh(),JSON.parse(raw)):fresh()}catch(e){S=fresh()}
 if(!S.whiteDefault){S.tees=[0,1,2].map(()=>({p0:'White',p1:'White',p2:'White'}));S.whiteDefault=true}
+if(!S.cgccDefault){S.courses[1]='cgcc';S.ld[1]=[9,18];S.tees=S.tees||[{},{},{}];S.tees[1]={p0:'White',p1:'White',p2:'White'};S.cgccDefault=true}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 /* ---------- Shared live board ---------- */
