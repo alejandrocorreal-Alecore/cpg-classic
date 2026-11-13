@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>The CPG Classic</title>
+<title>Correals Pretending to be Golfers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
@@ -44,6 +44,9 @@ button{cursor:pointer}
 .mast .sync{display:inline-block;margin-top:12px;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.1);font-family:var(--sans);font-size:12.5px;color:#CFE2D5}
 .mast .sync.live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#5BD07A;margin-right:6px;vertical-align:1px}
 .mast .sync.readonly,.mast .sync.error{background:rgba(242,194,48,.18);color:#F6E3A3}
+.mast h1{font-size:clamp(32px,9vw,44px);line-height:1.05;max-width:460px;margin-left:auto;margin-right:auto}
+.bday{font-family:var(--cond);font-weight:700;font-size:18px;margin:18px 0 2px}
+.bday:first-of-type{margin-top:6px}
 .mast p.tagline{font-family:var(--serif);font-style:italic;font-size:17px;color:#F2C230;letter-spacing:0;margin:-2px 0 6px}
 
 .panel{background:var(--panel);border-radius:14px;padding:16px;margin-bottom:14px}
@@ -449,7 +452,7 @@ function viewBoard(){
   const lastDay=[2,1,0].find(i=>days[i].started);
   const max=Math.max(...rows.map(r=>r.total));
   let html='';
-  if(days.every(x=>x.complete)){html+=`<div class="champ"><p>CPG Classic champion</p><strong>${rows.filter(r=>r.total===max).map(r=>esc(r.p.name)).join(' & ')}</strong></div>`}
+  if(days.every(x=>x.complete)){html+=`<div class="champ"><p>Champion</p><strong>${rows.filter(r=>r.total===max).map(r=>esc(r.p.name)).join(' & ')}</strong></div>`}
   html+=`<div class="board"><div class="board-head">LEADERS</div><div class="board-grid">
   <div class="brow hdr"><span>POS</span><span>PLAYER</span><span>WED</span><span>THU</span><span>FRI</span><span>PTS</span></div>`;
   rows.forEach(r=>{
@@ -468,11 +471,16 @@ function viewBoard(){
   <tr><td>All</td><td colspan="3" class="open" style="text-align:right">Combined putts, all rounds</td>${puttCell(Object.fromEntries(P().map(p=>[p.id,{seg:{total:days.reduce((a,x)=>({putts:a.putts+x.out[p.id].seg.total.putts,ptn:a.ptn+x.out[p.id].seg.total.ptn}),{putts:0,ptn:0})}}])),false)}</tr></table></div>`;
 
   if(anyStarted){
-    const cats=Object.keys(BONUS).filter(k=>rows.some(r=>r.d.some(o=>o.pts[k])));
-    html+=`<div class="panel"><details class="more"><summary>Bonus points</summary>
-    <table class="btable"><tr><th></th>${rows.map(r=>`<th>${esc(r.p.name)}</th>`).join('')}</tr>
+    const head=`<tr><th></th>${rows.map(r=>`<th>${esc(r.p.name)}</th>`).join('')}</tr>`;
+    html+=`<div class="panel"><details class="more" open><summary>Bonus points by day</summary>
+    ${days.map((x,k)=>{if(!x.started)return'';const cats=Object.keys(BONUS).filter(c=>rows.some(r=>r.d[k].pts[c]));
+      return`<h3 class="bday">${DAYS[k].label}, ${COURSES[S.courses[k]].short}</h3><table class="btable">${head}
+      <tr><td>Nassau</td>${rows.map(r=>`<td>${fp(r.d[k].nassau)}</td>`).join('')}</tr>
+      ${cats.map(c=>`<tr><td>${BONUS[c]}</td>${rows.map(r=>{const v=r.d[k].pts[c]||0;return`<td>${v?fs(v):'·'}</td>`}).join('')}</tr>`).join('')}
+      <tr><td>Day total</td>${rows.map(r=>`<td>${fp(r.d[k].total)}</td>`).join('')}</tr></table>`}).join('')}
+    <h3 class="bday">All three days</h3><table class="btable">${head}
     <tr><td>Nassau</td>${rows.map(r=>`<td>${fp(r.d.reduce((a,o)=>a+o.nassau,0))}</td>`).join('')}</tr>
-    ${cats.map(k=>`<tr><td>${BONUS[k]}</td>${rows.map(r=>{const v=r.d.reduce((a,o)=>a+(o.pts[k]||0),0);return`<td>${v?fs(v):'·'}</td>`}).join('')}</tr>`).join('')}
+    <tr><td>Bonus</td>${rows.map(r=>`<td>${fp(r.d.reduce((a,o)=>a+o.bonus,0))}</td>`).join('')}</tr>
     <tr><td>Total</td>${rows.map(r=>`<td>${fp(r.total)}</td>`).join('')}</tr></table></details></div>`;
   }else{
     html+=`<div class="panel"><h2>Ready on the first tee</h2><p class="sub" style="margin:0">Put everyone's handicap in Setup, then enter scores hole by hole on the Round tab.</p></div>`;
@@ -548,7 +556,7 @@ function viewRound(){
 
 function viewRules(){
   const R=(t,p,v)=>`<div class="rule"><div><strong>${t}</strong><p>${p}</p></div><b>${v}</b></div>`;
-  return `<div class="panel"><h2>The Nassau</h2><p class="sub">Three matches every day, decided on net score. Two-way ties split the points; if all three tie, it's a push and nobody scores. Most points after three days wins the CPG Classic.</p>
+  return `<div class="panel"><h2>The Nassau</h2><p class="sub">Three matches every day, decided on net score. Two-way ties split the points; if all three tie, it's a push and nobody scores. Most points after three days wins it all.</p>
   ${R('Front nine','Low net score on holes 1 to 9.','3')}
   ${R('Back nine','Low net score on holes 10 to 18.','3')}
   ${R('Full 18','Low net score for the round.','4')}
@@ -581,14 +589,14 @@ function viewSetup(){
     ${P().map(p=>{const t=teeOf(p.id,k),ch=courseHcp(p.id,k),st=playStrokes(p.id,k);return`<div class="teerow"><span>${esc(p.name)}</span><select class="sel" data-set="tee:${k}:${p.id}" aria-label="Tees for ${esc(p.name)}">${c.tees.map(tt=>`<option value="${tt.n}" ${tt.n===t.n?'selected':''}>${tt.n}, ${tt.y.toLocaleString()} yds (${tt.r} / ${tt.s})</option>`).join('')}</select><span class="small">Course handicap ${ch}, ${st?`gets ${st}`:'plays at zero'}</span></div>`}).join('')}
     <div class="ldrow">${[0,1].map(j=>`<select class="sel" data-set="ld:${k}:${j}" aria-label="Longest drive hole ${j+1}">${holes.map(n=>`<option value="${n}" ${S.ld[k][j]===n?'selected':''}>Long drive: #${n}</option>`).join('')}</select>`).join('')}</div></div>`}).join('')}
   </div>
-  <div class="panel"><h2>Start over</h2><p class="sub">Wipes every score and setting on this phone.</p><button class="danger" data-a="reset">Reset the CPG Classic</button></div>`;
+  <div class="panel"><h2>Start over</h2><p class="sub">Wipes every score and setting on this phone.</p><button class="danger" data-a="reset">Reset the tournament</button></div>`;
 }
 
 /* ---------- Render + events ---------- */
 function render(){
   const t=S.ui.tab;
   const views={board:viewBoard,round:viewRound,rules:viewRules,setup:viewSetup};
-  document.getElementById('app').innerHTML=`<header class="mast">${crest}<h1>The CPG Classic</h1><p class="tagline">Correals Pretending to be Good Athletes</p><p>Orlando, November 12–14, 2026</p>${SYNC[sync]?`<span class="sync ${sync}">${SYNC[sync]}</span>`:''}</header>`+views[t]();
+  document.getElementById('app').innerHTML=`<header class="mast">${crest}<h1>Correals Pretending to be Golfers</h1><p>Orlando, November 12–14, 2026</p>${SYNC[sync]?`<span class="sync ${sync}">${SYNC[sync]}</span>`:''}</header>`+views[t]();
   document.getElementById('tabs').innerHTML=[['board','Leaderboard'],['round','Round'],['rules','Rules'],['setup','Setup']].map(([k,l])=>`<button data-a="tab" data-v="${k}" aria-current="${t===k}">${l}</button>`).join('');
 }
 document.addEventListener('click',e=>{
